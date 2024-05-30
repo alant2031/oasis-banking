@@ -12,12 +12,12 @@ import { z } from 'zod';
 import AuthField from './auth-field';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { signIn, signUp } from '@/lib/actions/user.action';
 
 function AuthForm({ type }: AuthFormProps) {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [user, setUser] = useState(null);
-
 	const formSchema = authFormSchema(type);
 	// 1. Define your form.
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -26,29 +26,32 @@ function AuthForm({ type }: AuthFormProps) {
 			email: '',
 			password: '',
 			address1: '',
+			city: '',
 			cpf: '',
 			dateBirth: '',
 			firstName: '',
 			lastName: '',
 			state: '',
-			zip: '',
+			zipCode: '',
 		},
 	});
 
 	// 2. Define a submit handler.
 	const onSubmit = async (data: z.infer<typeof formSchema>) => {
+		setIsLoading(true);
 		try {
 			// signup appwrite & create plaid token
 
+			// TODO: 03|06|20
 			if (type === 'sign-up') {
-				// const newUser = await signUp(data)
-				// setUser(newUser)
+				const newUser = await signUp(data);
+				setUser(newUser);
 			} else if (type === 'sign-in') {
-				// const resp = await signIn({
-				// 	email: data.email,
-				// 	password: data.password
-				// })
-				// if(resp) router.push("/")
+				const resp = await signIn({
+					email: data.email,
+					password: data.password,
+				});
+				if (resp) router.push('/');
 			}
 		} catch (error) {
 			console.log(error);
@@ -99,12 +102,14 @@ function AuthForm({ type }: AuthFormProps) {
 											name="firstName"
 											label="Nome"
 											placeholder="Nome"
+											disabled={isLoading}
 										/>
 										<AuthField
 											control={form.control}
 											name="lastName"
 											label="Sobrenome"
 											placeholder="Sobrenome"
+											disabled={isLoading}
 										/>
 									</div>
 									<AuthField
@@ -112,12 +117,14 @@ function AuthForm({ type }: AuthFormProps) {
 										name="address1"
 										label="Endereço"
 										placeholder="Digite seu endereço completo"
+										disabled={isLoading}
 									/>
 									<AuthField
 										control={form.control}
 										name="city"
 										label="Cidade"
 										placeholder="Exemplo: São Paulo"
+										disabled={isLoading}
 									/>
 									<div className="flex gap-4">
 										<AuthField
@@ -125,12 +132,14 @@ function AuthForm({ type }: AuthFormProps) {
 											name="state"
 											label="Estado"
 											placeholder="Exemplo: SP"
+											disabled={isLoading}
 										/>
 										<AuthField
 											control={form.control}
-											name="zip"
+											name="zipCode"
 											label="CEP"
 											placeholder="Exemplo: 60022333"
+											disabled={isLoading}
 										/>
 									</div>
 									<div className="flex gap-4">
@@ -139,12 +148,14 @@ function AuthForm({ type }: AuthFormProps) {
 											name="dateBirth"
 											label="Data de Nascimento"
 											placeholder="DD/MM/YYYY"
+											disabled={isLoading}
 										/>
 										<AuthField
 											control={form.control}
 											name="cpf"
 											label="CPF"
 											placeholder="Exemplo: 44455566677"
+											disabled={isLoading}
 										/>
 									</div>
 								</>
@@ -154,12 +165,14 @@ function AuthForm({ type }: AuthFormProps) {
 								name="email"
 								label="Email"
 								placeholder="Digite seu email"
+								disabled={isLoading}
 							/>
 							<AuthField
 								control={form.control}
 								name="password"
 								label="Senha"
 								placeholder="Digite sua senha"
+								disabled={isLoading}
 							/>
 							<div className="flex flex-col gap-4">
 								<Button type="submit" className="form-btn" disabled={isLoading}>

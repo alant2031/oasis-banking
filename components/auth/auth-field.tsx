@@ -12,9 +12,16 @@ interface IAuthField {
 	name: FieldPath<z.infer<typeof formSchema>>;
 	label: string;
 	placeholder: string;
+	disabled?: boolean;
 }
 
-function AuthField({ control, name, label, placeholder }: IAuthField) {
+function AuthField({
+	control,
+	name,
+	label,
+	placeholder,
+	disabled = false,
+}: IAuthField) {
 	return (
 		<FormField
 			control={control}
@@ -31,6 +38,7 @@ function AuthField({ control, name, label, placeholder }: IAuthField) {
 								type={name === 'password' ? 'password' : 'text'}
 								{...field}
 								autoComplete="on"
+								disabled={disabled}
 							/>
 						</FormControl>
 						<FormMessage className="form-message mt-2" />
