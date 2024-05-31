@@ -11,6 +11,7 @@ function AuthLayout({
 			<div className="auth-asset">
 				<div>
 					<Image
+						// TODO: update image oasis-home-app
 						src="/icons/auth-image.svg"
 						alt="Auth image"
 						width={500}
