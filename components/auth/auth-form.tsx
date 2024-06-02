@@ -13,6 +13,7 @@ import AuthField from './auth-field';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { signIn, signUp } from '@/lib/actions/user.action';
+import PlaidLink from '@/components/plaid-link';
 
 function AuthForm({ type }: AuthFormProps) {
 	const router = useRouter();
@@ -42,9 +43,20 @@ function AuthForm({ type }: AuthFormProps) {
 		try {
 			// signup appwrite & create plaid token
 
-			// TODO: 03|06|20
 			if (type === 'sign-up') {
-				const newUser = await signUp(data);
+				const userData = {
+					firstName: data.firstName!,
+					lastName: data.lastName!,
+					address1: data.address1!,
+					city: data.city!,
+					state: data.state!,
+					zipCode: data.zipCode!,
+					dateBirth: data.dateBirth!,
+					cpf: data.cpf!,
+					email: data.email,
+					password: data.password,
+				};
+				const newUser = await signUp(userData);
 				setUser(newUser);
 			} else if (type === 'sign-in') {
 				const resp = await signIn({
@@ -88,123 +100,125 @@ function AuthForm({ type }: AuthFormProps) {
 					</h1>
 				</div>
 			</header>
-			{user ? (
-				<div className="flex flex-col gap-4">{/* PlaidLink */}</div>
-			) : (
-				<>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-							{type === 'sign-up' && (
-								<>
-									<div className="flex gap-4">
-										<AuthField
-											control={form.control}
-											name="firstName"
-											label="Nome"
-											placeholder="Nome"
-											disabled={isLoading}
-										/>
-										<AuthField
-											control={form.control}
-											name="lastName"
-											label="Sobrenome"
-											placeholder="Sobrenome"
-											disabled={isLoading}
-										/>
-									</div>
+			{/* {user ? ( */}
+			<div className="flex flex-col gap-4">
+				<PlaidLink user={user} variant="primary" />
+			</div>
+			{/* ) : ( */}
+			<>
+				<Form {...form}>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+						{type === 'sign-up' && (
+							<>
+								<div className="flex gap-4">
 									<AuthField
 										control={form.control}
-										name="address1"
-										label="Endereço"
-										placeholder="Digite seu endereço completo"
+										name="firstName"
+										label="Nome"
+										placeholder="Nome"
 										disabled={isLoading}
 									/>
 									<AuthField
 										control={form.control}
-										name="city"
-										label="Cidade"
-										placeholder="Exemplo: São Paulo"
+										name="lastName"
+										label="Sobrenome"
+										placeholder="Sobrenome"
 										disabled={isLoading}
 									/>
-									<div className="flex gap-4">
-										<AuthField
-											control={form.control}
-											name="state"
-											label="Estado"
-											placeholder="Exemplo: SP"
-											disabled={isLoading}
-										/>
-										<AuthField
-											control={form.control}
-											name="zipCode"
-											label="CEP"
-											placeholder="Exemplo: 60022333"
-											disabled={isLoading}
-										/>
+								</div>
+								<AuthField
+									control={form.control}
+									name="address1"
+									label="Endereço"
+									placeholder="Digite seu endereço completo"
+									disabled={isLoading}
+								/>
+								<AuthField
+									control={form.control}
+									name="city"
+									label="Cidade"
+									placeholder="Exemplo: São Paulo"
+									disabled={isLoading}
+								/>
+								<div className="flex gap-4">
+									<AuthField
+										control={form.control}
+										name="state"
+										label="Estado"
+										placeholder="Exemplo: SP"
+										disabled={isLoading}
+									/>
+									<AuthField
+										control={form.control}
+										name="zipCode"
+										label="CEP"
+										placeholder="Exemplo: 60022333"
+										disabled={isLoading}
+									/>
+								</div>
+								<div className="flex gap-4">
+									<AuthField
+										control={form.control}
+										name="dateBirth"
+										label="Data de Nascimento"
+										placeholder="DD/MM/YYYY"
+										disabled={isLoading}
+									/>
+									<AuthField
+										control={form.control}
+										name="cpf"
+										label="CPF"
+										placeholder="Exemplo: 44455566677"
+										disabled={isLoading}
+									/>
+								</div>
+							</>
+						)}
+						<AuthField
+							control={form.control}
+							name="email"
+							label="Email"
+							placeholder="Digite seu email"
+							disabled={isLoading}
+						/>
+						<AuthField
+							control={form.control}
+							name="password"
+							label="Senha"
+							placeholder="Digite sua senha"
+							disabled={isLoading}
+						/>
+						<div className="flex flex-col gap-4">
+							<Button type="submit" className="form-btn" disabled={isLoading}>
+								{isLoading ? (
+									<div className="flex gap-2">
+										<Loader2 className="animate-spin" />
+										<span>Carregando...</span>
 									</div>
-									<div className="flex gap-4">
-										<AuthField
-											control={form.control}
-											name="dateBirth"
-											label="Data de Nascimento"
-											placeholder="DD/MM/YYYY"
-											disabled={isLoading}
-										/>
-										<AuthField
-											control={form.control}
-											name="cpf"
-											label="CPF"
-											placeholder="Exemplo: 44455566677"
-											disabled={isLoading}
-										/>
-									</div>
-								</>
-							)}
-							<AuthField
-								control={form.control}
-								name="email"
-								label="Email"
-								placeholder="Digite seu email"
-								disabled={isLoading}
-							/>
-							<AuthField
-								control={form.control}
-								name="password"
-								label="Senha"
-								placeholder="Digite sua senha"
-								disabled={isLoading}
-							/>
-							<div className="flex flex-col gap-4">
-								<Button type="submit" className="form-btn" disabled={isLoading}>
-									{isLoading ? (
-										<div className="flex gap-2">
-											<Loader2 className="animate-spin" />
-											<span>Carregando...</span>
-										</div>
-									) : type === 'sign-in' ? (
-										'Entrar'
-									) : (
-										'Cadastrar'
-									)}
-								</Button>
-							</div>
-						</form>
-					</Form>
-					<footer className="flex justify-center gap-1">
-						<p className="text-14 font-normal text-gray-600">
-							{type === 'sign-in'
-								? 'Não possui uma conta?'
-								: 'Já possui uma conta?'}
-						</p>
-						<Link
-							href={type === 'sign-in' ? '/sign-up' : '/sign-in'}
-							className="form-link"
-						>
-							{type === 'sign-in' ? 'Cadastrar' : 'Entrar'}
-						</Link>
-					</footer>
-				</>
-			)}
+								) : type === 'sign-in' ? (
+									'Entrar'
+								) : (
+									'Cadastrar'
+								)}
+							</Button>
+						</div>
+					</form>
+				</Form>
+				<footer className="flex justify-center gap-1">
+					<p className="text-14 font-normal text-gray-600">
+						{type === 'sign-in'
+							? 'Não possui uma conta?'
+							: 'Já possui uma conta?'}
+					</p>
+					<Link
+						href={type === 'sign-in' ? '/sign-up' : '/sign-in'}
+						className="form-link"
+					>
+						{type === 'sign-in' ? 'Cadastrar' : 'Entrar'}
+					</Link>
+				</footer>
+			</>
+			{/* )} */}
 		</section>
 	);
 }
